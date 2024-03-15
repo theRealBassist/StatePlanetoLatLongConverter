@@ -4,6 +4,7 @@ from tkinter import filedialog
 from tablib import Dataset
 from difflib import SequenceMatcher
 import os
+import time
 
 def mainMenu():
     print("State Plane to Latitude/Longitude Converter")
@@ -15,6 +16,9 @@ def mainMenu():
     print("[X] - Exit")
 
     userInput = input()
+
+    if userInput == "X" or userInput == "x":
+            exitProgram()
 
     file = getFile()
     data = importData(file)
@@ -31,12 +35,10 @@ def mainMenu():
         EPSGTo = getEPSG(False)
         convertedCoordinates = convertedCoordinates(data, EPSGFrom, EPSGTo, False)
         newData = writeData(data, convertedCoordinates, True)
-    elif userInput == "X" or userInput == "x":
-        quit()
     else:
         print("This is not a valid input. Please try again")
         mainMenu()
-    
+    x
     exportData(file, newData)
 
 
@@ -46,6 +48,7 @@ def getEPSG(gettingFrom):
         print("West Georgia is zone `2240`")
     else:
         print("Please input the EPSG Zone that you are converting to.")
+        print("West Georgia is zone `2240`")
 
     try:
         EPSGZone = int(input())
@@ -64,7 +67,7 @@ def getFile(): #responsible for displaying the UI and collecting desired selecti
         if os.path.exists(workingFile): #pathlib is incompatible with pyinstaller, so I'm using os.path
             return workingFile
         elif workingFile == "":
-            break
+            exitProgram()
         else:
             print("This is not a valid directory! Please try again.")
             getFile()
@@ -80,12 +83,13 @@ def getHeader(data, toFind):
     for header in headers:
         if SequenceMatcher(None, toFind, header.lower()).ratio() > 0.75:
             return str(header)
+    
+    print ("Please make sure that you have columns in your .csv file which contain Easting/Northing or Latitude/Longitude!")
+    exitProgram()
 
 def convertCoordinates(importedData, EPSGFrom, EPSGTo, LatLong):
     transformer = Transformer.from_crs(f'EPSG:{EPSGFrom}', f'EPSG:{EPSGTo}', always_xy=True)
     
-
-
     if not LatLong:
         x = importedData[getHeader(importedData, "easting")]
         y = importedData[getHeader(importedData, "northing")]
@@ -116,5 +120,10 @@ def exportData(file, data):
     outputPath = os.path.join(os.path.dirname(os.path.realpath(file)), "output.csv")
     with open(outputPath, 'w', newline='') as outputFile:
         outputFile.write(data.csv)
+
+def exitProgram():
+    while True:
+        userInput = input("Press `Enter` to exit...")
+        quit()
 
 mainMenu()
