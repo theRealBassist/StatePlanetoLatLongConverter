@@ -1,0 +1,3 @@
+pip install pyproj
+pip install tkinter
+pip install tablib
