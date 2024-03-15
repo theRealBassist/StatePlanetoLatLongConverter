@@ -2,6 +2,7 @@ from pyproj import Transformer
 import tkinter
 from tkinter import filedialog
 from tablib import Dataset
+from difflib import SequenceMatcher
 import os
 
 def mainMenu():
@@ -73,16 +74,25 @@ def importData(workingFile):
         importedData = Dataset().load(file)
         return importedData
 
+def getHeader(data, toFind):
+    headers = data.headers
+    print(headers)
+
+    for header in headers:
+        if SequenceMatcher(None, toFind, header.lower()).ratio() > 0.75:
+            return str(header)
 
 def convertCoordinates(importedData, EPSGFrom, EPSGTo, LatLong):
     transformer = Transformer.from_crs(f'EPSG:{EPSGFrom}', f'EPSG:{EPSGTo}', always_xy=True)
+    
+
 
     if not LatLong:
-        x = importedData['EASTING']
-        y = importedData['NORTHING']
+        x = importedData[getHeader(importedData, "easting")]
+        y = importedData[getHeader(importedData, "northing")]
     else:
-        x = importedData['LATITUDE']
-        y = importedData['LONGITUDE']
+        x = importedData[getHeader(importedData, "latitude")]
+        y = importedData[getHeader(importedData, "longitude")]
 
     convertedX = []
     convertedY = []
