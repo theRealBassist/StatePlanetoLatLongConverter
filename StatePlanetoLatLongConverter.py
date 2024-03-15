@@ -38,7 +38,6 @@ def mainMenu():
     else:
         print("This is not a valid input. Please try again")
         mainMenu()
-    x
     exportData(file, newData)
 
 
