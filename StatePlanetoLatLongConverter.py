@@ -76,7 +76,6 @@ def importData(workingFile):
 
 def getHeader(data, toFind):
     headers = data.headers
-    print(headers)
 
     for header in headers:
         if SequenceMatcher(None, toFind, header.lower()).ratio() > 0.75:
