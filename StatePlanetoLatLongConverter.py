@@ -44,7 +44,7 @@ def mainMenu():
         continueInput = input("Press `Enter` to continue...")
         EPSGFrom = getEPSG(True)
         EPSGTo = getEPSG(False)
-        convertedCoordinates = convertedCoordinates(data, EPSGFrom, EPSGTo, False)
+        convertedCoordinates = convertCoordinates(data, EPSGFrom, EPSGTo, False)
         newData = writeData(data, convertedCoordinates, True)
     exportData(file, newData)
 
@@ -134,7 +134,7 @@ def exportData(file, data):
 
 def exitProgram():
     while True:
-        userInput = input("Press `Enter` to exit...")
+        exitInput = input("Press `Enter` to exit...")
         quit()
 
 mainMenu()
