@@ -25,7 +25,7 @@ def mainMenu():
     file = getFile()
     data = importData(file)
     if userInput == "L" or userInput == "l":
-        print("This conversion format will accept any EPSG code as a target.")
+        print("This conversion format will accept any EPSG code as a source.")
         print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
         continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(True)
@@ -33,7 +33,7 @@ def mainMenu():
         newData = writeData(data, convertedCoordinates, False)
     elif userInput == "S" or userInput == "s":
         print("This conversion format will accept any EPSG code as a target.")
-        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
+        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (US Survey ft.)")
         continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(False)
         convertedCoordinates = convertCoordinates(data, 4326, EPSGZone, True)
@@ -105,8 +105,8 @@ def convertCoordinates(importedData, EPSGFrom, EPSGTo, LatLong):
         x = importedData[getHeader(importedData, "easting")]
         y = importedData[getHeader(importedData, "northing")]
     else:
-        x = importedData[getHeader(importedData, "latitude")]
-        y = importedData[getHeader(importedData, "longitude")]
+        y = importedData[getHeader(importedData, "latitude")]
+        x = importedData[getHeader(importedData, "longitude")]
 
     convertedX = []
     convertedY = []
@@ -123,14 +123,21 @@ def writeData(data, convertedCoordinates, statePlane):
         data.append_col(convertedCoordinates[1], header="NORTHING")
         data.append_col(convertedCoordinates[0], header="EASTING")
     else:
-        data.append_col(convertedCoordinates[0], header="LATITUDE")
-        data.append_col(convertedCoordinates[1], header = "LONGITUDE")
+        data.append_col(convertedCoordinates[1], header="LATITUDE")
+        data.append_col(convertedCoordinates[0], header = "LONGITUDE")
     return data
 
 def exportData(file, data):
-    outputPath = os.path.join(os.path.dirname(os.path.realpath(file)), "output.csv")
-    with open(outputPath, 'w', newline='') as outputFile:
-        outputFile.write(data.csv)
+    try:
+        outputPath = os.path.join(os.path.dirname(os.path.realpath(file)), "output.csv")
+        with open(outputPath, 'w', newline='') as outputFile:
+            outputFile.write(data.csv)
+    except:
+        print("The program has insufficient permissions to write to this folder.\nPlease try selecting a new filename below. Please include .csv at the end.")
+        filename = input("Filename (`example.csv`): ")
+        outputPath = os.path.join(os.path.dirname(os.path.realpath(file)), filename)
+        with open(outputPath, 'w', newline='') as outputFile:
+            outputFile.write(data.csv)
 
 def exitProgram():
     while True:
