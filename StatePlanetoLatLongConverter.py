@@ -6,8 +6,8 @@ from difflib import SequenceMatcher
 import os
 
 def mainMenu():
-    print("State Plane to Latitude/Longitude Converter")
-    print("===============\n")
+    print("State Plane to Latitude/Longitude Converter".center(80))
+    print("===============\n".center(80))
 
     print("[L] - State Plane to Latitude/Longitude Conversion")
     print("[S] - Latitude/Longitude to State Plane Conversion")
@@ -26,7 +26,7 @@ def mainMenu():
     data = importData(file)
     if userInput == "L" or userInput == "l":
         print("This conversion format will accept any EPSG code as a source.")
-        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
+        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (US Survey ft.)")
         continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(True)
         convertedCoordinates = convertCoordinates(data, EPSGZone, 4326, False)
@@ -40,7 +40,7 @@ def mainMenu():
         newData = writeData(data, convertedCoordinates, True)
     elif userInput == "B" or userInput == "b":
         print("This conversion format will accept any EPSG code as a source and target.")
-        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
+        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (US Survey ft.)")
         continueInput = input("Press `Enter` to continue...")
         EPSGFrom = getEPSG(True)
         EPSGTo = getEPSG(False)
@@ -56,7 +56,7 @@ def getEPSG(gettingFrom):
         print("Please input the EPSG Zone that you are converting to.")
 
     try:
-        EPSGZone = int(input())
+        EPSGZone = int(input("EPSG Zone: "))
     except:
         print ("Please enter only digits for the EPSG Zone.")
         getEPSG(gettingFrom)
@@ -133,7 +133,7 @@ def exportData(file, data):
         with open(outputPath, 'w', newline='') as outputFile:
             outputFile.write(data.csv)
     except:
-        print("The program has insufficient permissions to write to this folder.\nPlease try selecting a new filename below. Please include .csv at the end.")
+        print("The program has insufficient permissions to write to this location. Please make sure the file is not currently open.\nPlease try selecting a new filename below. Please include .csv at the end.")
         filename = input("Filename (`example.csv`): ")
         outputPath = os.path.join(os.path.dirname(os.path.realpath(file)), filename)
         with open(outputPath, 'w', newline='') as outputFile:
