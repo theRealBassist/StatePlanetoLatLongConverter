@@ -4,50 +4,56 @@ from tkinter import filedialog
 from tablib import Dataset
 from difflib import SequenceMatcher
 import os
-import time
 
 def mainMenu():
     print("State Plane to Latitude/Longitude Converter")
-    print("===============")
+    print("===============\n")
 
     print("[L] - State Plane to Latitude/Longitude Conversion")
     print("[S] - Latitude/Longitude to State Plane Conversion")
     print("[B] - State Plane to State Plane Conversion")
     print("[X] - Exit")
 
-    userInput = input()
+    userInput = input("\nSelection: ")
 
     if userInput == "X" or userInput == "x":
             exitProgram()
+    elif userInput == "":
+        print("This is not a valid input. Please try again")
+        mainMenu()
 
     file = getFile()
     data = importData(file)
     if userInput == "L" or userInput == "l":
+        print("This conversion format will accept any EPSG code as a target.")
+        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
+        continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(True)
         convertedCoordinates = convertCoordinates(data, EPSGZone, 4326, False)
         newData = writeData(data, convertedCoordinates, False)
     elif userInput == "S" or userInput == "s":
+        print("This conversion format will accept any EPSG code as a target.")
+        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
+        continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(False)
         convertedCoordinates = convertCoordinates(data, 4326, EPSGZone, True)
         newData = writeData(data, convertedCoordinates, True)
     elif userInput == "B" or userInput == "b":
+        print("This conversion format will accept any EPSG code as a source and target.")
+        print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (Code 1713)")
+        continueInput = input("Press `Enter` to continue...")
         EPSGFrom = getEPSG(True)
         EPSGTo = getEPSG(False)
         convertedCoordinates = convertedCoordinates(data, EPSGFrom, EPSGTo, False)
         newData = writeData(data, convertedCoordinates, True)
-    else:
-        print("This is not a valid input. Please try again")
-        mainMenu()
     exportData(file, newData)
 
 
 def getEPSG(gettingFrom):
     if gettingFrom:
         print("Please input the EPSG Zone that the coordinates are in.")
-        print("West Georgia is zone `2240`")
     else:
         print("Please input the EPSG Zone that you are converting to.")
-        print("West Georgia is zone `2240`")
 
     try:
         EPSGZone = int(input())
@@ -59,22 +65,28 @@ def getEPSG(gettingFrom):
 def getFile(): #responsible for displaying the UI and collecting desired selections
     while True:
         try:
-            tkinter.Tk().withdraw()
-            workingFile = filedialog.askopenfilename(filetypes = [("CSV Files", "*.csv")], initialdir = "/", title = "Select the directory which contains your coordinates. \n Please ensure your EASTING and WESTING columns are named as such.") #Tkinter allows for the creation of pop-up file directories
+            window = tkinter.Tk()
+            window.wm_attributes("-topmost", 1)
+            window.withdraw()
+            workingFile = filedialog.askopenfilename(parent = window, filetypes = [("CSV Files", "*.csv")], initialdir = "/", title = "Select the directory which contains your coordinates.") #Tkinter allows for the creation of pop-up file directories
         except:
-            workingFile = input("Select the directory which contains your coordinates. \n Please ensure your EASTING and WESTING columns are named as such.")
+            workingFile = input("Enter the directory which contains your coordinates.")
         if os.path.exists(workingFile): #pathlib is incompatible with pyinstaller, so I'm using os.path
             return workingFile
         elif workingFile == "":
             exitProgram()
         else:
-            print("This is not a valid directory! Please try again.")
+            print("This is not a valid .csv file! Please try again.")
             getFile()
 
 def importData(workingFile):
-    with open(workingFile, 'r') as file:
-        importedData = Dataset().load(file)
-        return importedData
+    try:
+        with open(workingFile, 'r') as file:
+            importedData = Dataset().load(file)
+            return importedData
+    except:
+        print("There was an error importing the data.\n Please ensure the file exists where specified and is in the correct format.")
+        exitProgram()
 
 def getHeader(data, toFind):
     headers = data.headers
