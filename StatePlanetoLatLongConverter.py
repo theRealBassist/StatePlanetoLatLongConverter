@@ -29,14 +29,14 @@ def mainMenu():
         print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (US Survey ft.)")
         continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(True)
-        convertedCoordinates = convertCoordinates(data, EPSGZone, 4326, False)
+        convertedCoordinates = convertCoordinates(data, EPSGZone, 4326, True)
         newData = writeData(data, convertedCoordinates, False)
     elif userInput == "S" or userInput == "s":
         print("This conversion format will accept any EPSG code as a target.")
         print("Some useful codes: \n1. [26916] - NAD83 / UTM zone 16N\n2. [4326] - WGS 84 Latitude/Longitude\n3. [2240] - NAD83 State Plane West Georgia (US Survey ft.)")
         continueInput = input("Press `Enter` to continue...")
         EPSGZone = getEPSG(False)
-        convertedCoordinates = convertCoordinates(data, 4326, EPSGZone, True)
+        convertedCoordinates = convertCoordinates(data, 4326, EPSGZone, False)
         newData = writeData(data, convertedCoordinates, True)
     elif userInput == "B" or userInput == "b":
         print("This conversion format will accept any EPSG code as a source and target.")
@@ -44,7 +44,7 @@ def mainMenu():
         continueInput = input("Press `Enter` to continue...")
         EPSGFrom = getEPSG(True)
         EPSGTo = getEPSG(False)
-        convertedCoordinates = convertCoordinates(data, EPSGFrom, EPSGTo, False)
+        convertedCoordinates = convertCoordinates(data, EPSGFrom, EPSGTo, True)
         newData = writeData(data, convertedCoordinates, True)
     exportData(file, newData)
 
@@ -98,10 +98,10 @@ def getHeader(data, toFind):
     print ("Please make sure that you have columns in your .csv file which contain Easting/Northing or Latitude/Longitude!")
     exitProgram()
 
-def convertCoordinates(importedData, EPSGFrom, EPSGTo, LatLong):
+def convertCoordinates(importedData, EPSGFrom, EPSGTo, statePlane):
     transformer = Transformer.from_crs(f'EPSG:{EPSGFrom}', f'EPSG:{EPSGTo}', always_xy=True)
     
-    if not LatLong:
+    if statePlane:
         x = importedData[getHeader(importedData, "easting")]
         y = importedData[getHeader(importedData, "northing")]
     else:
